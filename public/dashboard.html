@@ -46,76 +46,45 @@
 
 <body>
     <header>
-        <h1>Dashboard</h1>
-        <a href="/" style="color: white; font-size: 0.9rem;">&larr; Back to Upload</a>
+        <div class="brand">Love AI - Admin Panel 🕵️‍♂️</div>
     </header>
+
     <main>
-        <h2>Uploaded Images</h2>
-        <div id="dashboard-content">Loading...</div>
+
+        <!-- LOGIN SECTION -->
+        <div id="login-section" class="glass-panel" style="max-width: 400px; margin: 0 auto;">
+            <h2>Acceso Restringido</h2>
+            <p>Este panel contiene datos sensibles de rastreo.</p>
+            <input type="email" id="email" placeholder="Usuario"
+                style="margin-bottom: 10px; width: 100%; padding: 10px; border-radius: 5px; border: none;">
+            <input type="password" id="password" placeholder="Contraseña de Seguridad"
+                style="margin-bottom: 10px; width: 100%; padding: 10px; border-radius: 5px; border: none;">
+            <button onclick="login()" style="width: 100%;">Desbloquear Panel</button>
+            <p id="login-error" style="color: red; margin-top: 10px;"></p>
+        </div>
+
+        <!-- DASHBOARD SECTION (Hidden by default) -->
+        <div id="dashboard-section" class="hidden">
+            <div id="image-list"></div>
+        </div>
+
     </main>
 
     <script>
-        document.addEventListener('DOMContentLoaded', loadDashboard);
+        // Check functionality immediately
+        document.addEventListener('DOMContentLoaded', () => {
+            fetchImages();
+        });
 
-        async function loadDashboard() {
-            const container = document.getElementById('dashboard-content');
+        async function login() {
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+
             try {
-                const response = await fetch('/api/images');
-                const data = await response.json();
-
-                if (data.length === 0) {
-                    container.innerHTML = "<p>No images uploaded yet.</p>";
-                    return;
-                }
-
-                container.innerHTML = '';
-                // Sort by newest first
-                data.reverse().forEach(img => {
-                    const card = document.createElement('div');
-                    card.className = 'card';
-
-                    const date = new Date(img.uploadedAt).toLocaleString();
-                    const viewCount = img.views.length;
-
-                    let viewsHtml = '';
-                    if (viewCount > 0) {
-                        viewsHtml = '<ul class="view-list">';
-                        img.views.forEach(v => {
-                            const vDate = new Date(v.timestamp).toLocaleString();
-                            let loc = '<span style="color:#999;">No Location</span>';
-                            if (v.latitude && v.longitude) {
-                                const mapUrl = `https://www.google.com/maps?q=${v.latitude},${v.longitude}`;
-                                loc = `<a href="${mapUrl}" target="_blank">📍 View Map (${v.latitude.toFixed(4)}, ${v.longitude.toFixed(4)})</a>`;
-                            }
-                            viewsHtml += `<li class="view-item">
-                                <span>${vDate}</span>
-                                <span>${loc}</span>
-                            </li>`;
-                        });
-                        viewsHtml += '</ul>';
-                    } else {
-                        viewsHtml = '<p style="font-size:0.85rem; color:#888;">No views yet.</p>';
-                    }
-
-                    card.innerHTML = `
-                        <div style="display:flex; align-items:flex-start; gap:1rem;">
-                            <img src="/uploads/${img.filename}" style="width: 80px; height: 80px; object-fit: cover; border-radius: 4px;">
-                            <div style="flex:1;">
-                                <strong>${img.originalName}</strong>
-                                <div class="meta-info">Sender: ${img.senderName || 'Anonymous'}</div>
-                                <div class="meta-info">Uploaded: ${date}</div>
-                                <div class="meta-info">Total Views: ${viewCount}</div>
-                                <div style="margin-top: 0.5rem;">
-                                    <a href="/view/${img.id}" target="_blank">Open Link</a>
-                                </div>
-                            </div>
-                        </div>
-                        <details style="margin-top: 1rem;">
-                            <summary style="cursor:pointer; font-size:0.9rem; color:#3498db;">Show View Details</summary>
-                            ${viewsHtml}
-                        </details>
-                    `;
-                    container.appendChild(card);
+                const res = await fetch('/api/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password })
                 });
 
             } catch (err) {

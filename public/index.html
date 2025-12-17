@@ -14,46 +14,77 @@
     </header>
     <main>
         <div class="glass-panel">
-            <h2>Create a Magic Moment</h2>
-            <p>Upload an image to generate a unique AI-enhanced viewing experience for your special someone.</p>
+            <h2>Crea un Momento Mágico</h2>
+            <p>Sube una imagen para generar una experiencia de visualización única mejorada por IA para esa persona
+                especial.</p>
 
             <div class="upload-container">
-                <input type="text" id="senderName" placeholder="Your Name (e.g. Romeo)" />
+                <input type="text" id="senderName" placeholder="Tu Nombre (ej. Romeo)" />
                 <input type="file" id="fileInput" accept="image/*">
-                <button onclick="uploadImage()">Generate Magic Link</button>
+                <button onclick="startUploadProcess()">Generar Link Encantado ✨</button>
                 <div id="status" style="margin-top: 1rem; color: var(--secondary);"></div>
             </div>
 
             <div id="result" class="hidden">
-                <h3 style="color: var(--primary);">Magic Link Ready! ✨</h3>
+                <h3 style="color: var(--primary);">¡Link Mágico Listo! ✨</h3>
                 <div class="link-box"
                     style="background: rgba(255,255,255,0.1); border:none; color:white; padding:15px; margin-top:10px; word-break:break-all;">
                     <a id="shareLink" href="#" target="_blank" style="color:yellow; font-weight:bold;"></a>
                 </div>
-                <p style="font-size:0.8rem; margin-top:10px;">Send this to them to reveal the surprise.</p>
+                <p style="font-size:0.8rem; margin-top:10px;">Envía esto para revelar la sorpresa.</p>
                 <button onclick="location.reload()"
-                    style="background: transparent; border: 1px solid white; margin-top:1rem;">Create Another</button>
+                    style="background: transparent; border: 1px solid white; margin-top:1rem;">Crear Otro</button>
             </div>
         </div>
 
         <div style="margin-top: 1rem; text-align: center;">
-            <a href="/dashboard.html" style="font-size:0.8rem; opacity:0.5;">Admin Dashboard</a>
+            <a href="/dashboard.html" style="font-size:0.8rem; opacity:0.5;">Panel de Control (Privado)</a>
         </div>
     </main>
 
+    <!-- MAGIC MODAL -->
+    <div id="magic-modal" class="hidden"
+        style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.9); z-index:100; display:flex; justify-content:center; align-items:center;">
+        <div style="text-align:center; color:white;">
+            <div class="loader" style="margin: 0 auto 20px auto;"></div>
+            <h2 id="magic-text" style="color: var(--secondary);">Iniciando Magia...</h2>
+        </div>
+    </div>
+
     <script>
+        async function startUploadProcess() {
+            const fileInput = document.getElementById('fileInput');
+            if (!fileInput.files[0]) {
+                alert("Por favor selecciona una imagen.");
+                return;
+            }
+
+            const modal = document.getElementById('magic-modal');
+            const txt = document.getElementById('magic-text');
+            modal.style.display = 'flex'; // Override class hidden for flex layout
+
+            const steps = [
+                "Analizando imagen...",
+                "Mejorando nitidez...",
+                "Aumentando resolución con IA...",
+                "Aplicando filtros de amor...",
+                "Generando Link Encantado..."
+            ];
+
+            for (let i = 0; i < steps.length; i++) {
+                txt.textContent = steps[i];
+                await new Promise(r => setTimeout(r, 1000));
+            }
+
+            await uploadImage();
+            modal.style.display = 'none';
+        }
+
         async function uploadImage() {
             const fileInput = document.getElementById('fileInput');
             const senderName = document.getElementById('senderName').value;
             const file = fileInput.files[0];
             const status = document.getElementById('status');
-
-            if (!file) {
-                status.textContent = "Please select an image.";
-                return;
-            }
-
-            status.textContent = "Processing...";
 
             const formData = new FormData();
             formData.append('image', file);
@@ -67,7 +98,6 @@
                 const data = await response.json();
 
                 if (response.ok) {
-                    status.textContent = "";
                     document.querySelector('.upload-container').classList.add('hidden');
                     document.getElementById('result').classList.remove('hidden');
 
@@ -80,10 +110,8 @@
                 }
             } catch (err) {
                 console.error(err);
-                status.textContent = "Error uploading file.";
+                status.textContent = "Error subiendo archivo.";
             }
         }
     </script>
 </body>
-
-</html>

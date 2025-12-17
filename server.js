@@ -7,12 +7,37 @@ const fs = require('fs');
 
 const app = express();
 const PORT = 3000;
+const cookieParser = require('cookie-parser');
 
 // Middleware
 app.use(cors());
 app.use(bodyParser.json());
+app.use(cookieParser());
 app.use(express.static('public'));
 app.use('/uploads', express.static('uploads'));
+
+const ADMIN_USER = 'user@loveia.com';
+const ADMIN_PASS = '1086358186';
+
+// Auth Middleware
+const requireAuth = (req, res, next) => {
+    if (req.cookies.adminToken === 'SECRET_LOVE_TOKEN') {
+        next();
+    } else {
+        res.status(401).json({ error: 'Unauthorized' });
+    }
+};
+
+// Login Route
+app.post('/api/login', (req, res) => {
+    const { email, password } = req.body;
+    if (email === ADMIN_USER && password === ADMIN_PASS) {
+        res.cookie('adminToken', 'SECRET_LOVE_TOKEN', { httpOnly: true, maxAge: 900000 }); // 15 min
+        res.json({ success: true });
+    } else {
+        res.status(401).json({ error: 'Credenciales inválidas' });
+    }
+});
 
 // Ensure directories exist
 const uploadDir = path.join(__dirname, 'uploads');
@@ -101,7 +126,7 @@ app.get('/api/image/:id', (req, res) => {
 });
 
 // 5. Admin Dashboard Data
-app.get('/api/images', (req, res) => {
+app.get('/api/images', requireAuth, (req, res) => {
     const db = getDB();
     res.json(db);
 });
