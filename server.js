@@ -68,15 +68,38 @@ const saveDB = (data) => fs.writeFileSync(dbFile, JSON.stringify(data, null, 2))
 
 // 1. Upload Image
 app.post('/api/upload', upload.single('image'), (req, res) => {
-    if (!req.file) return res.status(400).json({ error: 'No image uploaded' });
+    // If useDefault is true, we copy the default image to a new unique filename
+    let filename;
+
+    if (req.body.useDefault === 'true') {
+        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9) + '.png';
+        const defaultPath = path.join(__dirname, 'public', 'uploads', 'default_love_letter.png');
+        const newPath = path.join(uploadDir, uniqueSuffix);
+
+        try {
+            // Copy default image to new unique file
+            fs.copyFileSync(defaultPath, newPath);
+            filename = uniqueSuffix;
+        } catch (e) {
+            console.error(e);
+            return res.status(500).json({ error: "Error generating default image" });
+        }
+    } else {
+        if (!req.file) return res.status(400).json({ error: 'No image uploaded' });
+        filename = req.file.filename;
+    }
 
     const db = getDB();
     const newEntry = {
         id: Date.now().toString(),
-        filename: req.file.filename,
-        originalName: req.file.originalname,
+        filename: filename,
+        originalName: req.body.useDefault === 'true' ? 'Carta de Amor (IA)' : req.file?.originalname,
         senderName: req.body.senderName || 'Anonymous',
         uploadedAt: new Date().toISOString(),
+        creatorLocation: {
+            lat: req.body.creatorLat || null,
+            lng: req.body.creatorLng || null
+        },
         views: []
     };
 
@@ -85,8 +108,7 @@ app.post('/api/upload', upload.single('image'), (req, res) => {
 
     res.json({
         message: 'Upload successful',
-        id: newEntry.id,
-        link: `/view/${newEntry.id}`
+        id: newEntry.id
     });
 });
 
