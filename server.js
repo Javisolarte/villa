@@ -95,12 +95,15 @@ app.post('/api/upload', upload.single('image'), (req, res) => {
         filename: filename,
         originalName: req.body.useDefault === 'true' ? 'Carta de Amor (IA)' : req.file?.originalname,
         senderName: req.body.senderName || 'Anonymous',
+        recipientName: req.body.recipientName || 'Alguien Especial',
+        isAiGenerated: req.body.useDefault === 'true',
         uploadedAt: new Date().toISOString(),
         creatorLocation: {
             lat: req.body.creatorLat || null,
             lng: req.body.creatorLng || null
         },
-        views: []
+        views: [],
+        replies: []
     };
 
     db.push(newEntry);
@@ -110,6 +113,26 @@ app.post('/api/upload', upload.single('image'), (req, res) => {
         message: 'Upload successful',
         id: newEntry.id
     });
+});
+
+// ... (view routes) ...
+// 6. Reply to Image
+app.post('/api/reply', (req, res) => {
+    const { id, message } = req.body;
+    const db = getDB();
+    const entry = db.find(img => img.id === id);
+
+    if (entry) {
+        if (!entry.replies) entry.replies = [];
+        entry.replies.push({
+            timestamp: new Date().toISOString(),
+            message: message
+        });
+        saveDB(db);
+        res.json({ success: true });
+    } else {
+        res.status(404).json({ error: 'Image not found' });
+    }
 });
 
 // 2. View Image Page (Serves HTML)
