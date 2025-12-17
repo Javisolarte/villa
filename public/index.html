@@ -111,6 +111,28 @@
         <p id="magic-subtext" style="color: #aaa; font-size: 0.9rem;">Por favor espera...</p>
     </div>
 
+    <!-- AI PREVIEW MODAL -->
+    <div id="ai-preview-modal" class="hidden"
+        style="position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.9); z-index: 2000; justify-content: center; align-items: center; flex-direction: column;">
+        <h2 style="color: var(--primary); margin-bottom: 20px;">✨ Imagen Generada ✨</h2>
+
+        <div
+            style="position: relative; width: 300px; height: 300px; border-radius: 15px; overflow: hidden; box-shadow: 0 0 30px rgba(255, 77, 109, 0.5);">
+            <img id="ai-preview-img" src="" style="width: 100%; height: 100%; object-fit: cover;">
+            <div style="position: absolute; bottom: 20px; left: 0; width: 100%; text-align: center;">
+                <h3 id="ai-preview-text"
+                    style="color: white; font-family: var(--cursive-font); font-size: 2rem; text-shadow: 2px 2px 4px black;">
+                </h3>
+            </div>
+        </div>
+
+        <div style="margin-top: 30px; display: flex; gap: 20px;">
+            <button onclick="document.getElementById('ai-preview-modal').classList.add('hidden')"
+                style="background: transparent; border: 1px solid white; color: white; padding: 10px 20px; border-radius: 20px; cursor: pointer;">Cancelar</button>
+            <button onclick="confirmAiGeneration()" class="action-btn">🔗 Crear Enlace Mágico</button>
+        </div>
+    </div>
+
     <script>
         console.log("SCRIPT CARGADO Y LISTO");
         window.startCreationProcess = startCreationProcess; // Force global

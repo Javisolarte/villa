@@ -269,7 +269,8 @@
                 // SHOW DYNAMIC CARD
                 const card = document.getElementById('dynamic-card');
                 card.classList.remove('hidden');
-                document.getElementById('card-bg').src = `/uploads/${currentData.filename}`;
+                // Force floral default if AI
+                document.getElementById('card-bg').src = "https://images.unsplash.com/photo-1490750967868-58cb75069ed6?auto=format&fit=crop&w=600&q=80";
                 document.getElementById('recipient-overlay').textContent = currentData.recipientName || "Ti";
             } else {
                 // SHOW REGULAR IMAGE

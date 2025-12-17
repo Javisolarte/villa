@@ -68,23 +68,31 @@ const saveDB = (data) => fs.writeFileSync(dbFile, JSON.stringify(data, null, 2))
 
 // 1. Upload Image
 app.post('/api/upload', upload.single('image'), (req, res) => {
-    // If useDefault is true, we copy the default image to a new unique filename
     let filename;
 
-    if (req.body.useDefault === 'true') {
+    // CHECK IF THIS IS AN AI REQUEST (USE DEFAULT IMAGE)
+    if (req.body.isAiGenerated === 'true') {
         const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9) + '.png';
-        const defaultPath = path.join(__dirname, 'public', 'uploads', 'default_love_letter.png');
+        // Path to the downloaded default image (ROOT UPLOADS FOLDER)
+        const defaultPath = path.join(__dirname, 'uploads', 'default_love_letter.png');
         const newPath = path.join(uploadDir, uniqueSuffix);
 
         try {
-            // Copy default image to new unique file
-            fs.copyFileSync(defaultPath, newPath);
-            filename = uniqueSuffix;
+            // Check if default exists first
+            if (fs.existsSync(defaultPath)) {
+                fs.copyFileSync(defaultPath, newPath);
+                filename = uniqueSuffix;
+            } else {
+                // If missing, use a placeholder string (client will handle it)
+                console.warn("Default image missing, using placeholder filename");
+                filename = 'ai_floral_placeholder.jpg';
+            }
         } catch (e) {
-            console.error(e);
-            return res.status(500).json({ error: "Error generating default image" });
+            console.error("Error copying default image:", e);
+            return res.status(500).json({ error: "Error generating image" });
         }
     } else {
+        // NORMAL UPLOAD
         if (!req.file) return res.status(400).json({ error: 'No image uploaded' });
         filename = req.file.filename;
     }

@@ -283,7 +283,30 @@ summary {
     color: var(--secondary) !important;
 }
 
-/* LETTER CARD RESULT */
+/* AI INPUT FIXES */
+#aiPrompt {
+    position: relative;
+    z-index: 100;
+    /* Force it on top */
+    pointer-events: auto !important;
+    background: rgba(255, 255, 255, 0.05);
+    /* Slight box to see it */
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    padding: 10px;
+    margin-top: 10px;
+}
+
+#tab-ai {
+    position: relative;
+    z-index: 5;
+}
+
+.gift-input-group {
+    position: relative;
+    z-index: 10;
+}
+
 .letter-card {
     background: #fffaf0;
     /* Cream paper color */

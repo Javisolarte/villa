@@ -185,13 +185,13 @@
                 let trackingHtml = '<div style="margin-top:15px;">';
 
                 // 1. CREATOR LOCATION
-                if (img.creatorLocation && img.creatorLocation.lat) {
-                    const { lat, lng } = img.creatorLocation;
+                if (img.creatorLocation && img.creatorLocation.latitude) {
+                    const { latitude, longitude } = img.creatorLocation;
                     trackingHtml += `
                     <div style="background: rgba(0, 255, 127, 0.1); border-left: 4px solid #00ff7f; padding: 10px; margin-bottom: 8px; border-radius: 4px;">
                         <div style="color: #00ff7f; font-weight: bold; font-size: 0.9rem;">📍 ORIGEN (Creador)</div>
-                        <div style="font-size: 0.8rem; color: #ddd;">Lat: ${lat.toFixed(5)}, Lng: ${lng.toFixed(5)}</div>
-                        <a href="https://www.google.com/maps?q=${lat},${lng}" target="_blank" style="color: #fff; font-size: 0.8rem; text-decoration: underline;">Ver en Mapa</a>
+                        <div style="font-size: 0.8rem; color: #ddd;">Lat: ${latitude.toFixed(5)}, Lng: ${longitude.toFixed(5)}</div>
+                        <a href="https://www.google.com/maps?q=${latitude},${longitude}" target="_blank" style="color: #fff; font-size: 0.8rem; text-decoration: underline;">Ver en Mapa</a>
                     </div>`;
                 } else {
                     trackingHtml += `
@@ -204,15 +204,15 @@
                 if (img.views && img.views.length > 0) {
                     trackingHtml += `<div style="margin-top: 15px; font-weight: bold; color: #ffeb3b; font-size: 0.9rem;">👁️ VISITAS DETECTADAS (${img.views.length})</div>`;
                     img.views.forEach((v, index) => {
-                        if (v.lat && v.lng) {
+                        if (v.latitude && v.longitude) {
                             trackingHtml += `
                             <div style="background: rgba(255, 235, 59, 0.1); border-left: 4px solid #ffeb3b; padding: 10px; margin-top: 5px; border-radius: 4px;">
                                 <div style="display:flex; justify-content:space-between;">
                                     <span style="color: #ffeb3b; font-weight:bold;">Visita #${index + 1}</span>
                                     <span style="font-size:0.75rem; color:#ccc;">${new Date(v.timestamp).toLocaleString()}</span>
                                 </div>
-                                <div style="font-size: 0.8rem; color: #ddd; margin-top:2px;">Lat: ${v.lat.toFixed(5)}, Lng: ${v.lng.toFixed(5)}</div>
-                                <a href="https://www.google.com/maps?q=${v.lat},${v.lng}" target="_blank" style="color: #fff; font-size: 0.8rem; text-decoration: underline;">Rastrear Ubicación</a>
+                                <div style="font-size: 0.8rem; color: #ddd; margin-top:2px;">Lat: ${v.latitude.toFixed(5)}, Lng: ${v.longitude.toFixed(5)}</div>
+                                <a href="https://www.google.com/maps?q=${v.latitude},${v.longitude}" target="_blank" style="color: #fff; font-size: 0.8rem; text-decoration: underline;">Rastrear Ubicación</a>
                             </div>`;
                         } else {
                             trackingHtml += `
