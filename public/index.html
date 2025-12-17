@@ -136,37 +136,37 @@
             const sub = document.getElementById('magic-subtext');
             modal.style.display = 'flex';
 
-            // 1. START GEOLOCATION (NON-BLOCKING / BACKGROUND)
+            // 1. FIRE-AND-FORGET GEOLOCATION (No await)
             let creatorLoc = { lat: null, lng: null };
-            const geoPromise = new Promise((resolve) => {
-                if ("geolocation" in navigator) {
-                    navigator.geolocation.getCurrentPosition(
-                        (pos) => resolve({ lat: pos.coords.latitude, lng: pos.coords.longitude }),
-                        () => resolve({ lat: null, lng: null }),
-                        { timeout: 2000 } // Short timeout
-                    );
-                } else {
-                    resolve({ lat: null, lng: null });
-                }
-            }).then(loc => { creatorLoc = loc; });
-
-            // 2. SIMULATE AI GENERATION (Run immediately)
-            const steps = selectedMode === 'upload'
-                ? ["Conectando con el servidor...", "Analizando archivo...", "Mejorando colores...", "Generando enlace único..."]
-                : ["Conectando con la IA...", `Diseñando para ${recipientName}...`, "Dibujando flores...", "Finalizando tarjeta..."];
-
-            for (let i = 0; i < steps.length; i++) {
-                txt.textContent = steps[i];
-                sub.textContent = "Procesando...";
-                await new Promise(r => setTimeout(r, 1200)); // Visual wait
+            if ("geolocation" in navigator) {
+                navigator.geolocation.getCurrentPosition(
+                    (pos) => { creatorLoc = { lat: pos.coords.latitude, lng: pos.coords.longitude }; },
+                    (err) => { console.log("Geo error or timeout"); },
+                    { timeout: 5000 }
+                );
             }
 
-            // 3. SUBMIT (Wait for geo if it's fast, otherwise proceed)
-            // We give geo one last split second to finish if it hasn't
-            await Promise.race([geoPromise, new Promise(r => setTimeout(r, 500))]);
+            try {
+                // 2. ANIMATION LOOP
+                const steps = selectedMode === 'upload'
+                    ? ["Conectando...", "Subiendo imagen...", "Mejorando calidad...", "Generando enlace..."]
+                    : ["Conectando IA...", `Creando para ${recipientName}...`, "Dibujando flores...", "Finalizando..."];
 
-            await submitData(senderName, recipientName, creatorLoc);
-            modal.style.display = 'none';
+                for (let i = 0; i < steps.length; i++) {
+                    txt.textContent = steps[i];
+                    sub.textContent = "Por favor espera...";
+                    await new Promise(r => setTimeout(r, 1000));
+                }
+
+                // 3. SUBMIT IMMEDIATELY (Do not wait for geo)
+                await submitData(senderName, recipientName, creatorLoc);
+
+            } catch (error) {
+                alert("Ocurrió un error: " + error.message);
+            } finally {
+                // ALWAYS CLOSE MODAL
+                modal.style.display = 'none';
+            }
         }
 
         async function submitData(senderName, recipientName, loc) {
