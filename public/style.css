@@ -1,14 +1,13 @@
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&family=Great+Vibes&display=swap');
 
 :root {
     --primary: #ff4d6d;
     --secondary: #ff8fa3;
     --bg-dark: #121226;
-    /* Deep blue-ish dark */
     --card-bg: rgba(255, 255, 255, 0.05);
-    /* Glassmorphism */
     --text-main: #ffffff;
     --text-muted: #cdcdcd;
+    --cursive-font: 'Great Vibes', cursive;
 }
 
 body {
@@ -35,16 +34,18 @@ header {
 
 .brand {
     font-weight: 600;
-    font-size: 1.5rem;
+    font-size: 2rem;
     background: linear-gradient(to right, #ff4d6d, #ff8fa3);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     letter-spacing: 1px;
+    font-family: var(--cursive-font);
 }
 
 main {
-    width: 90%;
-    max-width: 600px;
+    width: 95%;
+    max-width: 800px;
+    /* WIDER CONTAINER */
     margin-top: 1rem;
     display: flex;
     flex-direction: column;
@@ -56,10 +57,11 @@ main {
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
     border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 16px;
-    padding: 2rem;
+    border-radius: 24px;
+    padding: 3rem;
+    /* More padding */
     width: 100%;
-    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+    box-shadow: 0 15px 40px 0 rgba(0, 0, 0, 0.4);
     text-align: center;
     margin-bottom: 2rem;
 }
@@ -67,58 +69,197 @@ main {
 h2 {
     font-weight: 400;
     margin-bottom: 0.5rem;
+    font-size: 2rem;
 }
 
 p {
     color: var(--text-muted);
-    font-size: 0.95rem;
-    line-height: 1.5;
+    font-size: 1rem;
+    line-height: 1.6;
 }
 
-/* Form Elements */
-input[type="text"],
-input[type="file"] {
+/* GIFT CARD STYLE INPUTS */
+.gift-input-group {
+    background: rgba(255, 255, 255, 0.03);
+    padding: 20px;
+    border-radius: 12px;
+    border: 1px dashed rgba(255, 255, 255, 0.2);
+    margin-bottom: 20px;
+    text-align: left;
+}
+
+.gift-label {
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--secondary);
+    display: block;
+    margin-bottom: 5px;
+}
+
+input[type="text"].gift-input {
     width: 100%;
-    padding: 12px;
-    margin: 10px 0;
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 8px;
+    padding: 10px 0;
+    margin: 0;
+    background: transparent;
+    border: none;
+    border-bottom: 2px solid rgba(255, 255, 255, 0.3);
+    border-radius: 0;
     color: white;
-    font-family: inherit;
-    box-sizing: border-box;
+    font-family: var(--cursive-font);
+    /* CURSIVE FONT */
+    font-size: 2.2rem;
+    line-height: 1.2;
+    transition: border-color 0.3s;
 }
 
-input[type="text"]:focus {
+input[type="text"].gift-input:focus {
     outline: none;
     border-color: var(--primary);
+    background: transparent;
 }
 
-button {
+input[type="text"].gift-input::placeholder {
+    font-family: 'Outfit', sans-serif;
+    font-size: 1rem;
+    opacity: 0.3;
+    font-style: italic;
+}
+
+
+/* TABS STYLING */
+.tabs {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin: 2rem 0;
+    background: rgba(0, 0, 0, 0.2);
+    padding: 5px;
+    border-radius: 50px;
+    width: fit-content;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.tab {
+    background: transparent;
+    color: #fff;
+    border: none;
+    padding: 10px 25px;
+    border-radius: 25px;
+    cursor: pointer;
+    font-size: 1rem;
+    opacity: 0.7;
+    transition: all 0.3s;
+    margin-top: 0;
+    width: auto;
+    box-shadow: none;
+}
+
+.tab.active {
+    background: var(--primary);
+    opacity: 1;
+    font-weight: 600;
+    box-shadow: 0 4px 15px rgba(255, 77, 109, 0.4);
+}
+
+.tab-content {
+    display: none;
+    animation: fadeIn 0.4s ease;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+/* FILE DROP AREA */
+.file-drop-area {
+    border: 2px dashed rgba(255, 255, 255, 0.2);
+    border-radius: 12px;
+    padding: 3rem;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.file-drop-area:hover {
+    border-color: var(--primary);
+    background: rgba(255, 77, 109, 0.05);
+}
+
+.file-input {
+    display: none;
+}
+
+.fake-btn {
+    display: inline-block;
+    background: rgba(255, 255, 255, 0.1);
+    padding: 10px 20px;
+    border-radius: 8px;
+    margin-bottom: 10px;
+}
+
+/* AI CHAT BOX */
+.ai-chat-box {
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 12px;
+    padding: 20px;
+    text-align: left;
+    border: 1px solid rgba(255, 77, 109, 0.2);
+}
+
+.ai-msg {
+    font-size: 1.1rem;
+    margin-bottom: 15px;
+    color: #fff;
+}
+
+.ai-input-wrapper input {
+    width: 100%;
+    padding: 15px;
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(0, 0, 0, 0.3);
+    color: white;
+}
+
+/* MAIN BUTTON */
+.action-btn {
     background: linear-gradient(135deg, var(--primary), #e63950);
     color: white;
     border: none;
-    padding: 14px 30px;
+    padding: 18px 40px;
     border-radius: 50px;
     cursor: pointer;
-    font-size: 1rem;
+    font-size: 1.2rem;
     font-weight: 600;
     transition: transform 0.2s, box-shadow 0.2s;
-    margin-top: 1rem;
+    margin-top: 2rem;
     width: 100%;
     box-shadow: 0 4px 15px rgba(255, 77, 109, 0.3);
 }
 
-button:hover {
+.action-btn:hover {
     transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(255, 77, 109, 0.4);
+    box-shadow: 0 8px 25px rgba(255, 77, 109, 0.5);
 }
 
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* UTILS */
 .hidden {
     display: none;
 }
 
-/* Dashboard Card Override */
 .card {
     background: rgba(255, 255, 255, 0.05) !important;
     border: 1px solid rgba(255, 255, 255, 0.1) !important;
@@ -142,7 +283,83 @@ summary {
     color: var(--secondary) !important;
 }
 
-a {
-    color: var(--secondary);
-    text-decoration: none;
+/* LETTER CARD RESULT */
+.letter-card {
+    background: #fffaf0;
+    /* Cream paper color */
+    color: #333;
+    /* Dark text for contrast on paper */
+    border-radius: 12px;
+    padding: 2rem;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    position: relative;
+    border: 1px solid #e0d0b0;
+    max-width: 90%;
+    margin: 0 auto;
+    animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.letter-card h3 {
+    font-family: var(--cursive-font);
+    font-size: 2.5rem;
+    color: var(--primary);
+    margin-top: 0.5rem;
+}
+
+.premium-link-box {
+    background: #f8f9fa;
+    border: 2px dashed var(--secondary);
+    border-radius: 8px;
+    padding: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 1.5rem 0;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.premium-link-box:hover {
+    background: #fff;
+    border-color: var(--primary);
+    transform: scale(1.02);
+}
+
+.link-text {
+    font-family: 'Courier New', monospace;
+    color: #555;
+    font-weight: bold;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    margin-right: 10px;
+    font-size: 0.9rem;
+}
+
+.copy-btn-premium {
+    background: var(--primary);
+    color: white;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 5px;
+    font-weight: bold;
+    cursor: pointer;
+    font-size: 0.8rem;
+    transition: all 0.2s;
+}
+
+.copy-btn-premium:hover {
+    background: #d63350;
+}
+
+@keyframes popIn {
+    from {
+        opacity: 0;
+        transform: scale(0.8);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
 }

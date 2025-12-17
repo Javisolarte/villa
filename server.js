@@ -16,8 +16,8 @@ app.use(cookieParser());
 app.use(express.static('public'));
 app.use('/uploads', express.static('uploads'));
 
-const ADMIN_USER = 'user@loveia.com';
-const ADMIN_PASS = '1086358186';
+const ADMIN_USER = '123';
+const ADMIN_PASS = '123';
 
 // Auth Middleware
 const requireAuth = (req, res, next) => {

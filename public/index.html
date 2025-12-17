@@ -13,22 +13,22 @@
         <div class="brand">Love AI 💘</div>
     </header>
     <main>
-        <div class="glass-panel" style="width: 100%; max-width: 500px;">
+        <!-- REMOVED INLINE MAX-WIDTH TO ALLOW WIDER CSS TO WORK -->
+        <div class="glass-panel" style="width: 100%;">
             <h2>Estudio de Creación Mágica</h2>
             <p style="margin-bottom: 2rem;">Diseña una experiencia inolvidable para tu persona especial.</p>
 
             <div class="upload-container" id="upload-stage">
 
-                <!-- SENDER NAME -->
-                <div class="input-group">
-                    <label>¿De parte de quién?</label>
-                    <input type="text" id="senderName" placeholder="Tu Nombre o Apodo (ej. Admirador Secreto)" />
+                <!-- GIFT CARD INPUTS -->
+                <div class="gift-input-group">
+                    <label class="gift-label">De parte de:</label>
+                    <input type="text" class="gift-input" id="senderName" placeholder="Tu nombre..." />
                 </div>
 
-                <!-- RECIPIENT NAME -->
-                <div class="input-group" style="margin-top: 10px;">
-                    <label>¿Para quién es?</label>
-                    <input type="text" id="recipientName" placeholder="Nombre de la persona especial" />
+                <div class="gift-input-group">
+                    <label class="gift-label">Para la persona especial:</label>
+                    <input type="text" class="gift-input" id="recipientName" placeholder="Su nombre..." />
                 </div>
 
                 <!-- OPTION TABS -->
@@ -40,8 +40,10 @@
                 <!-- FILE UPLOAD AREA -->
                 <div id="tab-upload" class="tab-content active">
                     <div class="file-drop-area" onclick="document.getElementById('fileInput').click()">
-                        <span class="fake-btn">Escoger Imagen</span>
-                        <span class="file-msg">o arrastra aquí tu foto favorita</span>
+                        <div style="font-size: 2rem; margin-bottom: 10px;">🖼️</div>
+                        <span class="fake-btn">Seleccionar Archivo</span>
+                        <div class="file-msg" style="margin-top: 10px; font-size: 0.9rem; color: #aaa;">o arrastra tu
+                            foto aquí</div>
                         <input class="file-input" type="file" id="fileInput" accept="image/*"
                             onchange="updateFileLabel(this)">
                     </div>
@@ -50,36 +52,48 @@
                 <!-- AI GENERATION AREA -->
                 <div id="tab-ai" class="tab-content">
                     <div class="ai-chat-box">
-                        <p class="ai-msg">👋 Soy la IA del Amor. ¿Qué deseas crear hoy?</p>
+                        <p class="ai-msg">� <b>Soy la IA del Amor.</b><br>Crearé una tarjeta romántica única para
+                            ustedes.</p>
                         <div class="ai-input-wrapper">
-                            <input type="text" id="aiPrompt" placeholder="Ej: Una carta de amor para Lina..." />
+                            <input type="text" id="aiPrompt" placeholder="Ej: Paisaje de atardecer en París..." disabled
+                                style="cursor: not-allowed; opacity: 0.6; value: 'Generación Automática'" />
                         </div>
-                        <p style="font-size: 0.75rem; color: #aaa; margin-top: 5px;">* Generaré una imagen única basada
-                            en tu petición.</p>
+                        <button class="action-btn" onclick="startCreationProcess()"
+                            style="margin-top: 15px; background: linear-gradient(to right, #6a11cb, #2575fc);">🪄
+                            Generar Imagen</button>
                     </div>
                 </div>
 
-                <button class="action-btn" onclick="startCreationProcess()">✨ Crear Experiencia Mágica ✨</button>
+                <!-- Main button only for Upload mode (AI has its own inside) -->
+                <button id="main-action-btn" class="action-btn" onclick="startCreationProcess()">✨ Crear Experiencia
+                    Mágica ✨</button>
+
                 <div id="status" style="margin-top: 1rem; color: var(--secondary);"></div>
             </div>
 
             <!-- RESULT STAGE -->
             <div id="result-stage" class="hidden">
-                <div style="font-size: 3rem; margin-bottom: 1rem;">💌</div>
-                <h3 style="color: var(--primary);">¡Tu Enlace Mágico está Listo!</h3>
-                <p>Tu persona especial verá la animación de IA y luego tu mensaje.</p>
+                <div class="letter-card">
+                    <div style="font-size: 3.5rem; margin-bottom: 0;">💌</div>
+                    <h3>¡Carta Lista!</h3>
+                    <p style="color: #666; font-style: italic;">"He guardado un secreto para ti..."</p>
+                    <p style="margin-bottom: 1.5rem; font-size: 0.9rem;">Tu persona especial verá una animación mágica
+                        antes de descubrir tu mensaje.</p>
 
-                <div class="link-box" onclick="copyLink()">
-                    <span id="shareLinkText">...</span>
-                    <button class="copy-btn">COPIAR</button>
+                    <div class="premium-link-box" onclick="copyLink()">
+                        <span id="shareLinkText" class="link-text">Generando...</span>
+                        <button class="copy-btn-premium">COPIAR</button>
+                    </div>
+
+                    <p style="font-size:0.8rem; margin-top:1rem; color:#999;">
+                        👆 Toca para copiar y enviar por WhatsApp
+                    </p>
                 </div>
 
-                <p style="font-size:0.8rem; margin-top:1.5rem; color:#aaa;">
-                    Envíalo por WhatsApp, Instagram o SMS.
-                </p>
                 <button onclick="location.reload()"
-                    style="background: transparent; border: 1px solid white; margin-top:1rem; padding: 8px 16px; border-radius: 20px; color: white; cursor: pointer;">Crear
-                    Otro</button>
+                    style="background: transparent; border: 1px solid rgba(255,255,255,0.3); margin-top:2rem; padding: 10px 25px; border-radius: 30px; color: rgba(255,255,255,0.7); cursor: pointer; transition: all 0.2s;">
+                    🔄 Crear Otra Carta
+                </button>
             </div>
         </div>
 
@@ -91,13 +105,16 @@
 
     <!-- MAGIC MODAL -->
     <div id="magic-modal" class="hidden"
-        style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.95); z-index:100; display:flex; flex-direction:column; justify-content:center; align-items:center;">
+        style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.95); z-index:100; display:none; flex-direction:column; justify-content:center; align-items:center;">
         <div class="loader" style="margin-bottom: 2rem;"></div>
-        <h2 id="magic-text" style="color: var(--secondary); font-size: 1.5rem;">Conectando con el corazón...</h2>
-        <p id="magic-subtext" style="color: #aaa; font-size: 0.9rem;">Verificando creador...</p>
+        <h2 id="magic-text" style="color: var(--secondary); font-size: 1.5rem;">Cargando...</h2>
+        <p id="magic-subtext" style="color: #aaa; font-size: 0.9rem;">Por favor espera...</p>
     </div>
 
     <script>
+        console.log("SCRIPT CARGADO Y LISTO");
+        window.startCreationProcess = startCreationProcess; // Force global
+
         let selectedMode = 'upload'; // 'upload' or 'ai'
 
         function switchTab(mode) {
@@ -107,6 +124,14 @@
 
             event.target.classList.add('active');
             document.getElementById(`tab-${mode}`).classList.add('active');
+
+            // Hide main button if in AI mode (since AI has its own button)
+            const mainBtn = document.getElementById('main-action-btn');
+            if (mode === 'ai') {
+                mainBtn.style.display = 'none';
+            } else {
+                mainBtn.style.display = 'block';
+            }
         }
 
         function updateFileLabel(input) {
@@ -122,59 +147,79 @@
         }
 
         async function startCreationProcess() {
-            const senderName = document.getElementById('senderName').value.trim();
-            const recipientName = document.getElementById('recipientName').value.trim();
-
-            if (!senderName || !recipientName) {
-                alert("Por favor completa ambos nombres (De parte de quién y Para quién).");
-                return;
-            }
-
-            // MODAL START
-            const modal = document.getElementById('magic-modal');
-            const txt = document.getElementById('magic-text');
-            const sub = document.getElementById('magic-subtext');
-            modal.style.display = 'flex';
-
-            // 1. FIRE-AND-FORGET GEOLOCATION (No await)
-            let creatorLoc = { lat: null, lng: null };
-            if ("geolocation" in navigator) {
-                navigator.geolocation.getCurrentPosition(
-                    (pos) => { creatorLoc = { lat: pos.coords.latitude, lng: pos.coords.longitude }; },
-                    (err) => { console.log("Geo error or timeout"); },
-                    { timeout: 5000 }
-                );
-            }
+            console.log(" FUNCION startCreationProcess INICIADA");
 
             try {
+                const senderName = document.getElementById('senderName').value.trim();
+                const recipientName = document.getElementById('recipientName').value.trim();
+
+                if (!senderName || !recipientName) {
+                    alert("Por favor completa ambos nombres.");
+                    return;
+                }
+
+                // MODAL START
+                const modal = document.getElementById('magic-modal');
+                const txt = document.getElementById('magic-text');
+                const sub = document.getElementById('magic-subtext');
+
+                console.log("Mostrando modal...");
+                modal.style.display = 'flex';
+
+                // FORCE UPDATE TO PROVE JS IS RUNNING
+                txt.textContent = "Iniciando sistema...";
+                sub.textContent = "Por favor espera...";
+
+                // 1. FIRE-AND-FORGET GEOLOCATION
+                let creatorLoc = { lat: null, lng: null };
+                console.log("Solicitando geolocalización (sin espera)...");
+
+                if ("geolocation" in navigator) {
+                    navigator.geolocation.getCurrentPosition(
+                        (pos) => {
+                            console.log("Ubicación obtenida:", pos.coords);
+                            creatorLoc = { lat: pos.coords.latitude, lng: pos.coords.longitude };
+                        },
+                        (err) => { console.warn("Error/Timeout Geo:", err); },
+                        { timeout: 3000 }
+                    );
+                } else {
+                    console.log("Geolocalización no soportada.");
+                }
+
                 // 2. ANIMATION LOOP
+                console.log("Iniciando bucle de animación. Modo:", selectedMode);
+
                 const steps = selectedMode === 'upload'
                     ? ["Conectando...", "Subiendo imagen...", "Mejorando calidad...", "Generando enlace..."]
                     : ["Conectando IA...", `Creando para ${recipientName}...`, "Dibujando flores...", "Finalizando..."];
 
                 for (let i = 0; i < steps.length; i++) {
+                    console.log(`Paso ${i + 1}/${steps.length}: ${steps[i]}`);
                     txt.textContent = steps[i];
-                    sub.textContent = "Por favor espera...";
+                    sub.textContent = "Procesando...";
                     await new Promise(r => setTimeout(r, 1000));
                 }
 
-                // 3. SUBMIT IMMEDIATELY (Do not wait for geo)
+                // 3. SUBMIT
+                console.log("Enviando datos al servidor...", creatorLoc);
                 await submitData(senderName, recipientName, creatorLoc);
+                console.log("Datos enviados correctamente.");
 
-            } catch (error) {
-                alert("Ocurrió un error: " + error.message);
-            } finally {
-                // ALWAYS CLOSE MODAL
-                modal.style.display = 'none';
+            } catch (err) {
+                console.error("ERROR CRITICO EN PROCESO:", err);
+                alert("Error: " + err.message);
+                document.getElementById('magic-modal').style.display = 'none';
             }
         }
 
         async function submitData(senderName, recipientName, loc) {
+            console.log("--> INICIANDO submitData");
             const formData = new FormData();
             formData.append('senderName', senderName);
-            formData.append('recipientName', recipientName); // New Field
+            formData.append('recipientName', recipientName);
 
-            if (loc.lat) {
+            if (loc && loc.lat) {
                 formData.append('creatorLat', loc.lat);
                 formData.append('creatorLng', loc.lng);
             }
@@ -182,34 +227,53 @@
             if (selectedMode === 'upload') {
                 const fileInput = document.getElementById('fileInput');
                 if (!fileInput.files[0]) {
-                    alert("Debes seleccionar una imagen en la pestaña 'Subir Foto'.");
+                    alert("Debes seleccionar una imagen.");
                     document.getElementById('magic-modal').style.display = 'none';
                     return;
                 }
                 formData.append('image', fileInput.files[0]);
             } else {
-                // AI MODE
                 formData.append('useDefault', 'true');
             }
 
             try {
+                console.log("Enviando petición fetch a /api/upload...");
+
+                // ADD TIMEOUT TO FETCH (15 seconds)
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 15000);
+
                 const response = await fetch('/api/upload', {
                     method: 'POST',
-                    body: formData
+                    body: formData,
+                    signal: controller.signal
                 });
+                clearTimeout(timeoutId);
+
+                console.log("Respuesta recibida. Status:", response.status);
                 const data = await response.json();
+                console.log("Data:", data);
 
                 if (response.ok) {
+                    // HIDE MODAL SO USER CAN SEE RESULT
+                    document.getElementById('magic-modal').style.display = 'none';
+
                     document.getElementById('upload-stage').classList.add('hidden');
                     document.getElementById('result-stage').classList.remove('hidden');
 
                     const link = `${window.location.origin}/view/${data.id}`;
                     document.getElementById('shareLinkText').innerText = link;
                 } else {
-                    alert("Error servidor: " + data.error);
+                    console.error("Server API Error:", data);
+                    alert("Error del servidor: " + (data.error || "Desconocido"));
                 }
             } catch (err) {
-                alert("Error de conexión. Intenta de nuevo.");
+                console.error("Error en submitData:", err);
+                if (err.name === 'AbortError') {
+                    alert("El servidor tardó demasiado en responder.");
+                } else {
+                    alert("Error de conexión: " + err.message);
+                }
             }
         }
     </script>
