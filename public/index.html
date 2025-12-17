@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Love AI - Image Generator</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <header>
+        <div class="brand">Love AI ✨</div>
+    </header>
+    <main>
+        <div class="glass-panel">
+            <h2>Create a Magic Moment</h2>
+            <p>Upload an image to generate a unique AI-enhanced viewing experience for your special someone.</p>
+
+            <div class="upload-container">
+                <input type="text" id="senderName" placeholder="Your Name (e.g. Romeo)" />
+                <input type="file" id="fileInput" accept="image/*">
+                <button onclick="uploadImage()">Generate Magic Link</button>
+                <div id="status" style="margin-top: 1rem; color: var(--secondary);"></div>
+            </div>
+
+            <div id="result" class="hidden">
+                <h3 style="color: var(--primary);">Magic Link Ready! ✨</h3>
+                <div class="link-box"
+                    style="background: rgba(255,255,255,0.1); border:none; color:white; padding:15px; margin-top:10px; word-break:break-all;">
+                    <a id="shareLink" href="#" target="_blank" style="color:yellow; font-weight:bold;"></a>
+                </div>
+                <p style="font-size:0.8rem; margin-top:10px;">Send this to them to reveal the surprise.</p>
+                <button onclick="location.reload()"
+                    style="background: transparent; border: 1px solid white; margin-top:1rem;">Create Another</button>
+            </div>
+        </div>
+
+        <div style="margin-top: 1rem; text-align: center;">
+            <a href="/dashboard.html" style="font-size:0.8rem; opacity:0.5;">Admin Dashboard</a>
+        </div>
+    </main>
+
+    <script>
+        async function uploadImage() {
+            const fileInput = document.getElementById('fileInput');
+            const senderName = document.getElementById('senderName').value;
+            const file = fileInput.files[0];
+            const status = document.getElementById('status');
+
+            if (!file) {
+                status.textContent = "Please select an image.";
+                return;
+            }
+
+            status.textContent = "Processing...";
+
+            const formData = new FormData();
+            formData.append('image', file);
+            formData.append('senderName', senderName);
+
+            try {
+                const response = await fetch('/api/upload', {
+                    method: 'POST',
+                    body: formData
+                });
+                const data = await response.json();
+
+                if (response.ok) {
+                    status.textContent = "";
+                    document.querySelector('.upload-container').classList.add('hidden');
+                    document.getElementById('result').classList.remove('hidden');
+
+                    const link = `${window.location.origin}${data.link}`;
+                    const linkElement = document.getElementById('shareLink');
+                    linkElement.href = link;
+                    linkElement.textContent = link;
+                } else {
+                    status.textContent = "Error: " + data.error;
+                }
+            } catch (err) {
+                console.error(err);
+                status.textContent = "Error uploading file.";
+            }
+        }
+    </script>
+</body>
+
+</html>

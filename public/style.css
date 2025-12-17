@@ -1,0 +1,148 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&display=swap');
+
+:root {
+    --primary: #ff4d6d;
+    --secondary: #ff8fa3;
+    --bg-dark: #121226;
+    /* Deep blue-ish dark */
+    --card-bg: rgba(255, 255, 255, 0.05);
+    /* Glassmorphism */
+    --text-main: #ffffff;
+    --text-muted: #cdcdcd;
+}
+
+body {
+    font-family: 'Outfit', sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: var(--bg-dark);
+    background-image:
+        radial-gradient(circle at 10% 20%, rgba(255, 77, 109, 0.15) 0%, transparent 20%),
+        radial-gradient(circle at 90% 80%, rgba(100, 50, 255, 0.15) 0%, transparent 20%);
+    color: var(--text-main);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 100vh;
+}
+
+header {
+    width: 100%;
+    padding: 1.5rem;
+    text-align: center;
+    background: transparent;
+}
+
+.brand {
+    font-weight: 600;
+    font-size: 1.5rem;
+    background: linear-gradient(to right, #ff4d6d, #ff8fa3);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    letter-spacing: 1px;
+}
+
+main {
+    width: 90%;
+    max-width: 600px;
+    margin-top: 1rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.glass-panel {
+    background: var(--card-bg);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 16px;
+    padding: 2rem;
+    width: 100%;
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+h2 {
+    font-weight: 400;
+    margin-bottom: 0.5rem;
+}
+
+p {
+    color: var(--text-muted);
+    font-size: 0.95rem;
+    line-height: 1.5;
+}
+
+/* Form Elements */
+input[type="text"],
+input[type="file"] {
+    width: 100%;
+    padding: 12px;
+    margin: 10px 0;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    color: white;
+    font-family: inherit;
+    box-sizing: border-box;
+}
+
+input[type="text"]:focus {
+    outline: none;
+    border-color: var(--primary);
+}
+
+button {
+    background: linear-gradient(135deg, var(--primary), #e63950);
+    color: white;
+    border: none;
+    padding: 14px 30px;
+    border-radius: 50px;
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: 600;
+    transition: transform 0.2s, box-shadow 0.2s;
+    margin-top: 1rem;
+    width: 100%;
+    box-shadow: 0 4px 15px rgba(255, 77, 109, 0.3);
+}
+
+button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(255, 77, 109, 0.4);
+}
+
+.hidden {
+    display: none;
+}
+
+/* Dashboard Card Override */
+.card {
+    background: rgba(255, 255, 255, 0.05) !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    color: white;
+}
+
+.meta-info {
+    color: #aaa !important;
+}
+
+.view-list {
+    background: rgba(0, 0, 0, 0.2) !important;
+    border: none !important;
+}
+
+.view-item {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05) !important;
+}
+
+summary {
+    color: var(--secondary) !important;
+}
+
+a {
+    color: var(--secondary);
+    text-decoration: none;
+}

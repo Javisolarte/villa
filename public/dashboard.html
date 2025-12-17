@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .card {
+            background: white;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            border: 1px solid #eee;
+        }
+
+        .meta-info {
+            font-size: 0.9rem;
+            color: #666;
+            margin-bottom: 0.5rem;
+        }
+
+        .view-list {
+            list-style: none;
+            padding: 0;
+            margin-top: 0.5rem;
+            background: #f9f9f9;
+            border-radius: 4px;
+        }
+
+        .view-item {
+            padding: 8px;
+            border-bottom: 1px solid #eee;
+            font-size: 0.85rem;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .view-item:last-child {
+            border-bottom: none;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <h1>Dashboard</h1>
+        <a href="/" style="color: white; font-size: 0.9rem;">&larr; Back to Upload</a>
+    </header>
+    <main>
+        <h2>Uploaded Images</h2>
+        <div id="dashboard-content">Loading...</div>
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', loadDashboard);
+
+        async function loadDashboard() {
+            const container = document.getElementById('dashboard-content');
+            try {
+                const response = await fetch('/api/images');
+                const data = await response.json();
+
+                if (data.length === 0) {
+                    container.innerHTML = "<p>No images uploaded yet.</p>";
+                    return;
+                }
+
+                container.innerHTML = '';
+                // Sort by newest first
+                data.reverse().forEach(img => {
+                    const card = document.createElement('div');
+                    card.className = 'card';
+
+                    const date = new Date(img.uploadedAt).toLocaleString();
+                    const viewCount = img.views.length;
+
+                    let viewsHtml = '';
+                    if (viewCount > 0) {
+                        viewsHtml = '<ul class="view-list">';
+                        img.views.forEach(v => {
+                            const vDate = new Date(v.timestamp).toLocaleString();
+                            let loc = '<span style="color:#999;">No Location</span>';
+                            if (v.latitude && v.longitude) {
+                                const mapUrl = `https://www.google.com/maps?q=${v.latitude},${v.longitude}`;
+                                loc = `<a href="${mapUrl}" target="_blank">📍 View Map (${v.latitude.toFixed(4)}, ${v.longitude.toFixed(4)})</a>`;
+                            }
+                            viewsHtml += `<li class="view-item">
+                                <span>${vDate}</span>
+                                <span>${loc}</span>
+                            </li>`;
+                        });
+                        viewsHtml += '</ul>';
+                    } else {
+                        viewsHtml = '<p style="font-size:0.85rem; color:#888;">No views yet.</p>';
+                    }
+
+                    card.innerHTML = `
+                        <div style="display:flex; align-items:flex-start; gap:1rem;">
+                            <img src="/uploads/${img.filename}" style="width: 80px; height: 80px; object-fit: cover; border-radius: 4px;">
+                            <div style="flex:1;">
+                                <strong>${img.originalName}</strong>
+                                <div class="meta-info">Sender: ${img.senderName || 'Anonymous'}</div>
+                                <div class="meta-info">Uploaded: ${date}</div>
+                                <div class="meta-info">Total Views: ${viewCount}</div>
+                                <div style="margin-top: 0.5rem;">
+                                    <a href="/view/${img.id}" target="_blank">Open Link</a>
+                                </div>
+                            </div>
+                        </div>
+                        <details style="margin-top: 1rem;">
+                            <summary style="cursor:pointer; font-size:0.9rem; color:#3498db;">Show View Details</summary>
+                            ${viewsHtml}
+                        </details>
+                    `;
+                    container.appendChild(card);
+                });
+
+            } catch (err) {
+                console.error(err);
+                container.textContent = "Error loading data.";
+            }
+        }
+    </script>
+</body>
+
+</html>

